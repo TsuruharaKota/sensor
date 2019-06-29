@@ -45,7 +45,6 @@ int main(){
         return -1;
     }
     i2cClose(handle);
-
     //get time_now
     //time_diff = time_now - time_prev;
     //get the each data
