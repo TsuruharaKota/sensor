@@ -6,6 +6,7 @@ using std::cout;
 using std::endl;
 
 constexpr double resolution = 131.0;
+int pi;
 
 typedef enum{
     MPU_WHO_AM_I 0x75;
