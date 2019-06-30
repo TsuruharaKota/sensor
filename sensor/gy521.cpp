@@ -18,37 +18,39 @@ typedef enum{
 }RegisterMap;
 
 int main(){
+    //setting pigpio
+    int pi = pigpio_start(0, 0);
     //setting i2c
     //open i2c
-    namespace setting{
-        int handle = i2cOpen(device, RegisterMap MPU_SET, 0);
-            if(handle < 0){
-                cout << "ERROR: can not open I2C." << endl;
-                return -1;
-            }
-        RegisterMap set = MPU_SET;
-        RegisterMap add = MPU_ADDRESS;
-        int result = i2ci_write_block_data(handle, set, &add, 1);
-        if(result){
-            cout << "ERROR: can not set mpu_address." << endl;
-            switch(result){
-                case PI_BAD_HANDLE:
-                    cout << "BAD_HANDLE" << endl;
-                    break;
-                case PI_BAD_PARAM:
-                    cout << "BAD_PARAM" << endl;
-                    break;
-                case PI_I2C_WRITE_FAILED:
-                    cout << "WRITE_FAILED" << endl;
-                    break;
+    int handle_setting = i2cOpen(pi, device, RegisterMap MPU_SET, 0);
+    if(handle_setting < 0){
+        cout << "ERROR: can not open I2C." << endl;
+        return -1;
+    }
+    RegisterMap set = MPU_SET;
+    RegisterMap add = MPU_ADDRESS;
+    int result = i2ci_write_block_data(pi, handle, set, &add, 1);
+    if(result){
+        cout << "ERROR: can not set mpu_address." << endl;
+        switch(result){
+            case PI_BAD_HANDLE:
+                cout << "BAD_HANDLE" << endl;
+                break;
+            case PI_BAD_PARAM:
+                cout << "BAD_PARAM" << endl;
+                break;
+            case PI_I2C_WRITE_FAILED:
+                cout << "WRITE_FAILED" << endl;
+                break;
                 default
                     cout << "UNKNOWN" << endl;
-            }
-            return -1;
         }
-        i2cClose(handle);
+        return -1;
     }
-    namespace main
+    i2cClose(handle);
+
+    int handle_data = i2cOpen(pi, device, RegisterMap MPU_ADDRESS, 0);
+    i2c_write_byte(pi, handle, 0x00);
     //get time_now
     auto time_start = system_clock::now();
     //get the each data
