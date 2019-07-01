@@ -8,58 +8,31 @@ using std::chrono;
 
 constexpr double resolution = 131.0;
 int pi;
-
+double degree = 0;
 typedef enum{
     MPU_WHO_AM_I = 0x75;
     MPU_SET = 0x6B;
+    MPU_SIGNAL = 0x3B;
     MPU_ADDRESS = 0x68;
     GYRO_ZOUT_H = 0x47;
     GYRO_ZOUT_L = 0x48;
 }RegisterMap;
 
 int main(){
-    //setting pigpio
     int pi = pigpio_start(0, 0);
-    //setting i2c
-    //open i2c
-    int handle_setting = i2cOpen(pi, device, RegisterMap MPU_SET, 0);
-    if(handle_setting < 0){
-        cout << "ERROR: can not open I2C." << endl;
-        return -1;
-    }
     RegisterMap set = MPU_SET;
     RegisterMap add = MPU_ADDRESS;
-    int result = i2ci_write_block_data(pi, handle, set, &add, 1);
-    if(result){
-        cout << "ERROR: can not set mpu_address." << endl;
-        switch(result){
-            case PI_BAD_HANDLE:
-                cout << "BAD_HANDLE" << endl;
-                break;
-            case PI_BAD_PARAM:
-                cout << "BAD_PARAM" << endl;
-                break;
-            case PI_I2C_WRITE_FAILED:
-                cout << "WRITE_FAILED" << endl;
-                break;
-                default
-                    cout << "UNKNOWN" << endl;
-        }
-        return -1;
+    while(1){
+        int handle_data = i2cOpen(pi, device, RegisterMap MPU_ADDRESS, 0);
+        i2c_write_byte(pi, handle_data, &MPU_SET, 0x00);
+        int16_t gzRaw = i2c_read_byte_data(pi, handle_data, 0X47) << 8 | i2c_read_byte_data(pi, handle_data, 0x48);
+        double gyro_z = gzRaw / 131.0;
+        auto time_end = system_clock::now();
+        auto time_diff = time_end - time_start;
+        degree += gyro_z * time_diff
+            cout << degree << endl;
+        auto time_start = system_clock::now();
     }
-    i2cClose(handle);
-
-    int handle_data = i2cOpen(pi, device, RegisterMap MPU_ADDRESS, 0);
-    i2c_write_byte(pi, handle, 0x00);
-    //get time_now
-    auto time_start = system_clock::now();
-    //get the each data
-
-    //time_prev = time_now
-    auto time_end = system_clock::now();
-    //time_diff = time_now - time_prev;
-    auto time_diff = time_end - time_prev;
-    //calculate the sensor angle(degree);
-    //display the result
+    i2c_close(pi, handle_data);
 }
 
