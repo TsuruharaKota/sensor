@@ -23,14 +23,16 @@ int main(){
   //  RegisterMap add = MPU_ADDRESS;
     int handle_datum = i2c_open(pi, 1, 0x68, 0);
     i2c_write_byte_data(pi, handle_datum, 0x6B, 0x00);
+    i2c_write_byte_data(pi, handle_datum, 0x1B, 0x00);
     while(1){
         auto time_start = std::chrono::system_clock::now();
         int16_t gzRaw = i2c_read_byte_data(pi, handle_datum, 0X47) << 8 | i2c_read_byte_data(pi, handle_datum, 0x48);
         double gyro_z = gzRaw / 131.0;
         auto time_end = std::chrono::system_clock::now();
         double time_diff = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_start).count();
-        degree += gyro_z * time_diff;
-            cout << degree << endl;
+        degree += gyro_z * (time_diff / 1000);
+        cout << degree << endl;
+//        cout << time_diff << endl;
     }
     i2c_close(pi, handle_datum);
 }
