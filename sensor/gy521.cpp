@@ -21,10 +21,10 @@ int main(){
     int pi = pigpio_start(0, 0);
   //  RegisterMap set = MPU_SET;
   //  RegisterMap add = MPU_ADDRESS;
+    int handle_datum = i2c_open(pi, 1, 0x68, 0);
+    i2c_write_byte_data(pi, handle_datum, 0x6B, 0x00);
     while(1){
         auto time_start = std::chrono::system_clock::now();
-        int handle_datum = i2cOpen(pi, device, 0x68, 0);
-        i2c_write_byte(pi, handle_datum, 0x6B, 0x00);
         int16_t gzRaw = i2c_read_byte_data(pi, handle_datum, 0X47) << 8 | i2c_read_byte_data(pi, handle_datum, 0x48);
         double gyro_z = gzRaw / 131.0;
         auto time_end = std::chrono::system_clock::now();
