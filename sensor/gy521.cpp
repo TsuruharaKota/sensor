@@ -6,8 +6,10 @@ using std::cout;
 using std::endl;
 
 //constexpr double resolution = 131.0;
+constexpr double lpf_value = 10.0;
 int pi;
 double degree = 0;
+double lpf_prev = 0;
 /*typedef enum{
     MPU_WHO_AM_I = 0x75;
     MPU_SET = 0x6B;
@@ -31,7 +33,9 @@ int main(){
         auto time_end = std::chrono::system_clock::now();
         double time_diff = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_start).count();
         degree += gyro_z * (time_diff / 1000);
-        cout << degree << endl;
+        double lpf_gyro = (1 - lpf_value) * lpf_prev + lpf_value * degree;
+        lpf_prev = lpf_gyro;
+        cout << lpf_gyro << endl;
 //        cout << time_diff << endl;
     }
     i2c_close(pi, handle_datum);
