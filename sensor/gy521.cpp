@@ -38,10 +38,9 @@ int main(){
         degree += gyro_z * (time_diff / 1000);
         sum += degree;
     }
-    double average = sum / 100;
+ //   double average = sum / 100;
 
     while(1){
-        static int counter = 1;
         auto time_start = std::chrono::system_clock::now();
         int16_t gzRaw = i2c_read_byte_data(pi, handle_datum, 0X47) << 8 | i2c_read_byte_data(pi, handle_datum, 0x48);
         double gyro_z = gzRaw / 131.0;
@@ -53,15 +52,7 @@ int main(){
 //        lpf_prev = lpf_gyro;
         cout << degree << endl;
         //        cout << time_diff << endl;
-        ++counter;
-        char degree_sample[1000];
-        degree_sample[counter] = degree;
-        FILE *file;
-        file = fopen("gyro.txt", "w");
-        fprintf(file, degree_sample[counter]);
-        ++counter;
     }
-    fclose(file);
     i2c_close(pi, handle_datum);
 }
 
