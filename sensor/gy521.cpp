@@ -28,7 +28,9 @@ int main(){
     i2c_write_byte_data(pi, handle_datum, 0x6B, 0x00);
     i2c_write_byte_data(pi, handle_datum, 0x1B, 0x00);
     time_sleep(3.0);
-    double sum = 0;
+    unsigned long long double loops_number = 100;
+    double function_first = 0;
+    double function_second = 0;
     for(int i =0; i < 100; ++i){
         auto time_start = std::chrono::system_clock::now();
         int16_t gzRaw = i2c_read_byte_data(pi, handle_datum, 0X47) << 8 | i2c_read_byte_data(pi, handle_datum, 0x48);
@@ -36,11 +38,19 @@ int main(){
         auto time_end = std::chrono::system_clock::now();
         double time_diff = std::chrono::duration_cast<std::chrono::milliseconds>(time_end-time_start).count();
         degree += gyro_z * (time_diff / 1000);
-        sum += degree;
+        if(i = 0){
+            y_first = degree;
+        if(i = 99)function_second = degree;
+            y_second = degree;
+        }
     }
- //   double average = sum / 100;
+
+    double gyro_value;
+    //calibration function
+    constexpr double function_a = ((y_second - y_first) / 100);
 
     while(1){
+        ++loops_number;
         auto time_start = std::chrono::system_clock::now();
         int16_t gzRaw = i2c_read_byte_data(pi, handle_datum, 0X47) << 8 | i2c_read_byte_data(pi, handle_datum, 0x48);
         double gyro_z = gzRaw / 131.0;
@@ -50,7 +60,7 @@ int main(){
         //      double lpf_gyro = (1 - lpf_value) * lpf_prev + lpf_value * degree;i
 //        lpf_gyro += lpf_value * (degree - lpf_prev);
 //        lpf_prev = lpf_gyro;
-        cout << degree << endl;
+        cout << (degree + (function_a * loops_number)) << endl;
         //        cout << time_diff << endl;
     }
     i2c_close(pi, handle_datum);
