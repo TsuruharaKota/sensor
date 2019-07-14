@@ -1,0 +1,6 @@
+<launch>
+    <node name="joy_node" pkg="joy" type="joy_node" />
+    <node name="controller" pkg="dozap_second" type="controller" />
+    <node name="main" pkg="dozap_second" type="main" />
+    <node name="md" pkg="dozap_second" type="md" output="screen"/>
+</launch>
