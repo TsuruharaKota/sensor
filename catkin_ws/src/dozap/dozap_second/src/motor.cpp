@@ -1,6 +1,7 @@
 #include<ros/ros.h>
 #include<pigpiod_if2.h>
 #include<dozap_second/Main.h>
+#include<iostream>
 
 constexpr int RIGHT_MOTOR_IN1 = 2;
 constexpr int RIGHT_MOTOR_IN2 = 3;
@@ -44,17 +45,21 @@ void MD::OUTPUT(int check, float pwm){
         case -1:
             gpio_write(pi, user_A, 1);
             gpio_write(pi, user_B, 0);
+            std::cout << "back:";
             break;
         case 1:
             gpio_write(pi, user_A, 0);
             gpio_write(pi, user_B, 1);
+            std::cout << "front:";
             break;
         default:
             gpio_write(pi, user_A, 0);
             gpio_write(pi, user_B, 0);
+            std::cout << "stop:";
             break;
     }
     set_PWM_dutycycle(pi, user_pwm, pwm);
+    std::cout << pwm << std::endl;
 }
 
 int MD::convert(float x){
@@ -76,7 +81,7 @@ void setup(){
 
 float judge_right, judge_left;
 
-void controller_callback(const dozap_second::Main &main_msg){
+void pwm_callback(const dozap_second::Main &main_msg){
     judge_right = main_msg.motor_right;
     judge_left = main_msg.motor_left;
 }
@@ -85,7 +90,7 @@ int main(int argc, char **argv){
     setup();
     ros::init(argc, argv, "md");
     ros::NodeHandle n;
-    ros::Subscriber md_sub = n.subscribe("controller_info", 10, controller_callback);
+    ros::Subscriber md_sub = n.subscribe("pwm_info", 10, pwm_callback);
     MD right_motor = MD(RIGHT_MOTOR_IN1, RIGHT_MOTOR_IN2, RIGHT_MOTOR_PWM);
     MD left_motor = MD(LEFT_MOTOR_IN1, LEFT_MOTOR_IN2, LEFT_MOTOR_PWM);
     ros::Rate loop_rate(10);
